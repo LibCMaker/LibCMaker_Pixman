@@ -31,6 +31,12 @@ set(SOURCES
   pixman-utils.c
 )
 
+if(ANDROID)
+  list(APPEND SOURCES
+    "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c"
+  )
+endif()
+
 set(HEADERS
   pixman.h
   pixman-accessor.h
@@ -40,6 +46,12 @@ set(HEADERS
   pixman-inlines.h
   pixman-private.h
 )
+
+if(ANDROID)
+  list(APPEND HEADERS
+    "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.h"
+  )
+endif()
 
 if(USE_X86_MMX)
   list(APPEND SOURCES
@@ -95,6 +107,13 @@ if(USE_ARM_SIMD)
     pixman-arm-asm.h
     pixman-arm-simd-asm.h
   )
+  if(ANDROID)
+    set_source_files_properties(
+      pixman-arm-simd-asm.S
+      pixman-arm-simd-asm-scaled.S
+      PROPERTIES COMPILE_FLAGS "-fno-integrated-as"
+    )
+  endif()
 endif()
 
 if(USE_ARM_NEON)
@@ -108,6 +127,13 @@ if(USE_ARM_NEON)
     pixman-arm-asm.h
     pixman-arm-neon-asm.h
   )
+  if(ANDROID)
+    set_source_files_properties(
+      pixman-arm-neon-asm.S
+      pixman-arm-neon-asm-bilinear.S
+      PROPERTIES COMPILE_FLAGS "-fno-integrated-as"
+    )
+  endif()
 endif()
 
 if(USE_ARM_IWMMXT)

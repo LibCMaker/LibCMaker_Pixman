@@ -44,6 +44,12 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/pixman
 )
 
+if(ANDROID)
+  include_directories(
+    "${ANDROID_NDK}/sources/android/cpufeatures"
+  )
+endif()
+
 find_library(LIBM_LIBRARY m)
 if(LIBM_LIBRARY)
   set(CMAKE_REQUIRED_LIBRARIES ${LIBM_LIBRARY})
@@ -215,6 +221,10 @@ int main () {
   MSVC OFF  # TODO:
 )
 
+set(ARM_SIMD_FLAGS "-x assembler-with-cpp")
+if(ANDROID)
+  set(ARM_SIMD_FLAGS "${ARM_SIMD_FLAGS} -fno-integrated-as")
+endif()
 check_target_feature(
 ".text
 .arch armv6
@@ -228,11 +238,15 @@ check_target_feature(
 main:
 pld [r0]
 uqadd8 r0, r0, r0"
-  "-x assembler-with-cpp"
+  "${ARM_SIMD_FLAGS}"
   USE_ARM_SIMD "Use ARM SIMD assembly optimizations"
   MSVC OFF
 )
 
+set(ARM_NEON_FLAGS "-x assembler-with-cpp")
+if(ANDROID)
+  set(ARM_NEON_FLAGS "${ARM_NEON_FLAGS} -fno-integrated-as")
+endif()
 check_target_feature(
 ".text
 .fpu neon
@@ -248,7 +262,7 @@ check_target_feature(
 main:
 pld [r0]
 vmovn.u16 d0, q0"
-  "-x assembler-with-cpp"
+  "${ARM_NEON_FLAGS}"
   USE_ARM_NEON "Use ARM NEON assembly optimizations"
   MSVC OFF
 )
@@ -314,10 +328,10 @@ check_c_source_compiles(
 )
 
 # TODO: do not use PkgConfig
-find_package(PkgConfig)
-if(PKGCONFIG_FOUND)
-  pkg_check_modules(GTK gtk+-2.0>=2.16)
-endif()
+#find_package(PkgConfig)
+#if(PKGCONFIG_FOUND)
+#  pkg_check_modules(GTK gtk+-2.0>=2.16)
+#endif()
 
 # TODO: move to above options
 set(PIXMAN_TIMERS OFF CACHE BOOL "Enable TIMER_BEGIN/TIMER_END macros")
