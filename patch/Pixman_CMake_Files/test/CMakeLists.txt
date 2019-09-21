@@ -20,6 +20,7 @@ set(TESTPROGRAMS
   gradient-crash-test
   pixel-test
   matrix-test
+  filter-reduction-test
   composite-traps-test
   region-contains-test
   glyph-test
