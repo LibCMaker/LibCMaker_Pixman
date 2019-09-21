@@ -1,7 +1,8 @@
 project(pixman C ASM)
 cmake_minimum_required(VERSION 3.0)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# TODO: add gnuplot, see 'configure.ac' from pixman-0.38.4
 
 include(CheckTypeSize)
 include(CheckIncludeFile)
@@ -13,35 +14,42 @@ include(CheckCFlag)
 include(CheckTargetFeature)
 
 # Versioning
-file(READ configure.ac configure_ac)
+file(READ "${CMAKE_CURRENT_LIST_DIR}/configure.ac" configure_ac)
 string(REGEX REPLACE ".*m4_define\\(\\[pixman_major\\], ([0-9]+)\\).*" "\\1"
-                     PIXMAN_VERSION_MAJOR ${configure_ac})
+  PIXMAN_VERSION_MAJOR ${configure_ac}
+)
 string(REGEX REPLACE ".*m4_define\\(\\[pixman_minor\\], ([0-9]+)\\).*" "\\1"
-                     PIXMAN_VERSION_MINOR ${configure_ac})
+  PIXMAN_VERSION_MINOR ${configure_ac}
+)
 string(REGEX REPLACE ".*m4_define\\(\\[pixman_micro\\], ([0-9]+)\\).*" "\\1"
-                     PIXMAN_VERSION_MICRO ${configure_ac})
-set(PIXMAN_VERSION "${PIXMAN_VERSION_MAJOR}.${PIXMAN_VERSION_MINOR}.${PIXMAN_VERSION_MICRO}")
+  PIXMAN_VERSION_MICRO ${configure_ac}
+)
+set(PIXMAN_VERSION
+  "${PIXMAN_VERSION_MAJOR}.${PIXMAN_VERSION_MINOR}.${PIXMAN_VERSION_MICRO}"
+)
 message(STATUS "Building pixman version ${PIXMAN_VERSION}")
 
 # Building
-set(PIXMAN_BUILD_TESTS  ON CACHE BOOL "Build and run regression tests")
-set(PIXMAN_BUILD_DEMOS  ON CACHE BOOL "Build demo code")
+set(PIXMAN_BUILD_TESTS ON CACHE BOOL "Build and run regression tests")
+set(PIXMAN_BUILD_DEMOS ON CACHE BOOL "Build demo code")
 
 if(PIXMAN_BUILD_TESTS)
-    enable_testing()
+  enable_testing()
 endif()
 
 # Configuration
+# TODO: use modern CMake
 include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR}/pixman
-    ${CMAKE_CURRENT_SOURCE_DIR}/pixman
+  ${CMAKE_CURRENT_BINARY_DIR}/pixman
+  ${CMAKE_CURRENT_SOURCE_DIR}/pixman
 )
 
 find_library(LIBM_LIBRARY m)
 if(LIBM_LIBRARY)
-    set(CMAKE_REQUIRED_LIBRARIES ${LIBM_LIBRARY})
+  set(CMAKE_REQUIRED_LIBRARIES ${LIBM_LIBRARY})
 endif()
 
+# TODO:
 set(WORDS_BIGENDIAN ${CMAKE_WORDS_BIGENDIAN})
 check_inline()
 
@@ -49,20 +57,21 @@ check_function_exists(getisax HAVE_GETISAX)
 check_type_size(long SIZEOF_LONG)
 
 if(NOT MSVC)
-	check_c_flag(-Wall)
-	check_c_flag(-Wdeclaration-after-statement)
-	check_c_flag(-Wno-unused-local-typedefs)
-	check_c_flag(-fno-strict-aliasing)
+  check_c_flag(-Wall)
+  check_c_flag(-Wdeclaration-after-statement)
+  check_c_flag(-Wno-unused-local-typedefs)
+  check_c_flag(-fno-strict-aliasing)
 endif()
 
+# TODO:
 if(NOT MSVC)
-    # Currently, OpenMP code cannot be built with MSVC; it fails with
-    # "utils.h:23: 'threadprivate' is only valid for global or static data items"
-    find_package(OpenMP)
-    if(OPENMP_FOUND)
-       set(USE_OPENMP ${OPENMP_FOUND})
-       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    endif()
+  # Currently, OpenMP code cannot be built with MSVC; it fails with
+  # "utils.h:23: 'threadprivate' is only valid for global or static data items"
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+   set(USE_OPENMP ${OPENMP_FOUND})
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  endif()
 endif()
 
 set(LOONGSON_MMI_FLAGS "-march=loongson2f")
@@ -83,19 +92,22 @@ int main () {
     __m64 c = _mm_srli_pi16 (a.v, b);
     return 0;
 }"
-    "${LOONGSON_MMI_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}"
-    USE_LOONGSON_MMI "Enable Loongson MMI fast paths"
-    MSVC OFF)
+  "${LOONGSON_MMI_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}"
+  USE_LOONGSON_MMI "Enable Loongson MMI fast paths"
+  MSVC OFF
+)
 
 if(MSVC)
-    set(X86_MMX_FLAGS "-w14710 -w14714")
+  set(X86_MMX_FLAGS "-w14710 -w14714")
 else()
-    set(X86_MMX_FLAGS "-mmmx -Winline")
+  set(X86_MMX_FLAGS "-mmmx -Winline")
 endif()
+
+# TODO:
 if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-    set(USE_X86_MMX_MSVC ON)
+  set(USE_X86_MMX_MSVC ON)
 else()
-    set(USE_X86_MMX_MSVC OFF)
+  set(USE_X86_MMX_MSVC OFF)
 endif()
 check_target_feature(
 "#if defined(__GNUC__) && (__GNUC__ < 3 || (__GNUC__ == 3 && __GNUC_MINOR__ < 4))
@@ -132,14 +144,15 @@ int main () {
 
     return _mm_cvtsi64_si32 (v);
 }"
-    "${X86_MMX_FLAGS}"
-    USE_X86_MMX "Use x86 MMX compiler intrinsics"
-    MSVC ${USE_X86_MMX_MSVC})
+  "${X86_MMX_FLAGS}"
+  USE_X86_MMX "Use x86 MMX compiler intrinsics"
+  MSVC ${USE_X86_MMX_MSVC}
+)
 
 if(MSVC)
-    set(SSE2_FLAGS "")
+  set(SSE2_FLAGS "")
 else()
-    set(SSE2_FLAGS "-msse2 -Winline")
+  set(SSE2_FLAGS "-msse2 -Winline")
 endif()
 check_target_feature(
 "#if defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 2))
@@ -156,14 +169,15 @@ int main () {
     c = _mm_xor_si128 (a, b);
     return _mm_cvtsi128_si32(c);
 }"
-    "${SSE2_FLAGS}"
-    USE_SSE2 "Use SSE2 compiler intrinsics"
-    MSVC ON)
+  "${SSE2_FLAGS}"
+  USE_SSE2 "Use SSE2 compiler intrinsics"
+  MSVC ON
+)
 
 if(MSVC)
-    set(SSSE3_FLAGS "")
+  set(SSSE3_FLAGS "")
 else()
-    set(SSSE3_FLAGS "-mssse3 -Winline")
+  set(SSSE3_FLAGS "-mssse3 -Winline")
 endif()
 check_target_feature(
 "#include <mmintrin.h>
@@ -176,14 +190,15 @@ int main () {
     c = _mm_maddubs_epi16 (a, b);
     return _mm_cvtsi128_si32(c);
 }"
-    "${SSSE3_FLAGS}"
-    USE_SSSE3 "Use SSSE3 compiler intrinsics"
-    MSVC ON)
+  "${SSSE3_FLAGS}"
+  USE_SSSE3 "Use SSSE3 compiler intrinsics"
+  MSVC ON
+)
 
 if(APPLE)
-    set(VMX_FLAGS "-faltivec")
+  set(VMX_FLAGS "-faltivec")
 else()
-    set(VMX_FLAGS "-maltivec -mabi=altivec")
+  set(VMX_FLAGS "-maltivec -mabi=altivec")
 endif()
 check_target_feature(
 "#if defined(__GNUC__) && (__GNUC__ < 3 || (__GNUC__ == 3 && __GNUC_MINOR__ < 4))
@@ -195,9 +210,10 @@ int main () {
     v = vec_sub (v, v);
     return 0;
 }"
-    "${VMX_FLAGS}"
-    USE_VMX "Use VMX compiler intrinsics"
-    MSVC OFF)
+  "${VMX_FLAGS}"
+  USE_VMX "Use VMX compiler intrinsics"
+  MSVC OFF  # TODO:
+)
 
 check_target_feature(
 ".text
@@ -212,9 +228,10 @@ check_target_feature(
 main:
 pld [r0]
 uqadd8 r0, r0, r0"
-    "-x assembler-with-cpp"
-    USE_ARM_SIMD "Use ARM SIMD assembly optimizations"
-    MSVC OFF)
+  "-x assembler-with-cpp"
+  USE_ARM_SIMD "Use ARM SIMD assembly optimizations"
+  MSVC OFF
+)
 
 check_target_feature(
 ".text
@@ -231,15 +248,16 @@ check_target_feature(
 main:
 pld [r0]
 vmovn.u16 d0, q0"
-    "-x assembler-with-cpp"
-    USE_ARM_NEON "Use ARM NEON assembly optimizations"
-    MSVC OFF)
+  "-x assembler-with-cpp"
+  USE_ARM_NEON "Use ARM NEON assembly optimizations"
+  MSVC OFF
+)
 
 set(IWMMXT_FLAGS "-flax-vector-conversions -Winline -march=iwmmxt")
 set(PIXMAN_ENABLE_IWMMXT2 ON CACHE BOOL
-    "Build ARM IWMMXT fast paths with -march=iwmmxt2")
+  "Build ARM IWMMXT fast paths with -march=iwmmxt2")
 if(PIXMAN_ENABLE_IWMMXT2)
-    set(IWMMXT_FLAGS "${IWMMXT_FLAGS}2")
+  set(IWMMXT_FLAGS "${IWMMXT_FLAGS}2")
 endif()
 check_target_feature(
 "#ifndef __arm__
@@ -260,9 +278,10 @@ int main () {
     int b = 4;
     __m64 c = _mm_srli_si64 (a.v, b);
 }"
-    "${IWMMXT_FLAGS}"
-    USE_ARM_IWMMXT "Use ARM IWMMXT compiler intrinsics"
-    MSVC OFF)
+  "${IWMMXT_FLAGS}"
+  USE_ARM_IWMMXT "Use ARM IWMMXT compiler intrinsics"
+  MSVC OFF
+)
 
 set(MIPS_DSPR2_FLAGS "-mdspr2")
 check_target_feature(
@@ -280,9 +299,10 @@ main ()
     );
     return c;
 }"
-    "${MIPS_DSPR2_FLAGS}"
-    USE_MIPS_DSPR2 "Enable MIPS DSPr2 fast paths"
-    MSVC OFF)
+  "${MIPS_DSPR2_FLAGS}"
+  USE_MIPS_DSPR2 "Enable MIPS DSPr2 fast paths"
+  MSVC OFF
+)
 
 check_c_source_compiles(
 "int main () {
@@ -290,13 +310,16 @@ check_c_source_compiles(
     asm volatile ( \"\\\\tnop\\\\n\" : : : \"cc\", \"memory\" );
     return 0;
 }"
-    USE_GCC_INLINE_ASM)
+  USE_GCC_INLINE_ASM
+)
 
+# TODO: do not use PkgConfig
 find_package(PkgConfig)
 if(PKGCONFIG_FOUND)
-    pkg_check_modules(GTK gtk+-2.0>=2.16)
+  pkg_check_modules(GTK gtk+-2.0>=2.16)
 endif()
 
+# TODO: move to above options
 set(PIXMAN_TIMERS OFF CACHE BOOL "Enable TIMER_BEGIN/TIMER_END macros")
 
 check_function_exists(posix_memalign      HAVE_POSIX_MEMALIGN)
@@ -313,13 +336,14 @@ check_function_exists(gettimeofday        HAVE_GETTIMEOFDAY)
 check_c_source_compiles(
 "#include <math.h>
 int main() {sqrtf(0.0); return 0;}"
-	HAVE_SQRTF)
+  HAVE_SQRTF
+)
 if(NOT HAVE_SQRTF)
-    set(sqrtf sqrt)
+  set(sqrtf sqrt)
 endif()
 
 foreach(keyword "__thread" "__declspec(thread)")
-    check_c_source_compiles(
+  check_c_source_compiles(
 "#if defined(__MINGW32__) && !(__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
 #error This MinGW version has broken __thread support
 #endif
@@ -329,15 +353,17 @@ foreach(keyword "__thread" "__declspec(thread)")
 
 int ${keyword} test;
 int main() { return 0; }"
-        HAVE_TLS_${keyword})
-    if(HAVE_TLS_${keyword})
-        set(TLS ${keyword})
-        break()
-    endif()
+    HAVE_TLS_${keyword}
+  )
+  if(HAVE_TLS_${keyword})
+    set(TLS ${keyword})
+    break()
+  endif()
 endforeach()
 
 find_package(Threads)
 set(HAVE_PTHREADS ${CMAKE_USE_PTHREADS_INIT})
+# TODO: use modern CMake
 link_libraries(${CMAKE_THREAD_LIBS_INIT})
 
 check_c_source_compiles(
@@ -351,33 +377,38 @@ int main (void) { return x; }
 #else
 #error not gcc or gcc version is older than 2.7
 #endif"
-    TOOLCHAIN_SUPPORTS_ATTRIBUTE_CONSTRUCTOR)
+  TOOLCHAIN_SUPPORTS_ATTRIBUTE_CONSTRUCTOR
+)
 
 check_c_source_compiles(
 "__float128 a = 1.0Q, b = 2.0Q; int main (void) { return a + b; }"
-    HAVE_FLOAT128)
+  HAVE_FLOAT128
+)
 
 check_c_source_compiles(
 "unsigned int x = 11; int main (void) { return __builtin_clz(x); }"
-    HAVE_BUILTIN_CLZ)
+  HAVE_BUILTIN_CLZ
+)
 
 check_c_source_compiles(
 "unsigned int __attribute__ ((vector_size(16))) e, a, b;
 int main (void) { e = a - ((b << 27) + (b >> (32 - 27))) + 1; return e[0]; }"
-    HAVE_GCC_VECTOR_EXTENSIONS)
+  HAVE_GCC_VECTOR_EXTENSIONS
+)
 
 set(HAVE_LIBPNG ${PNG_FOUND})
 
 add_definitions(-DHAVE_CONFIG_H)
 configure_file(
-    cmake/config.h.in
-    ${CMAKE_CURRENT_BINARY_DIR}/pixman/config.h)
+  cmake/config.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/pixman/config.h
+)
 
 # Components
 add_subdirectory(pixman)
 if(PIXMAN_BUILD_TESTS)
-    add_subdirectory(test)
+  add_subdirectory(test)
 endif()
 if(PIXMAN_BUILD_DEMOS AND GTK_FOUND)
-    add_subdirectory(demos)
+  add_subdirectory(demos)
 endif()
