@@ -48,8 +48,8 @@ set(COPY_PIXMAN_CMAKE_BUILD_SCRIPTS ON)
 # Library specific vars and options
 #-----------------------------------------------------------------------
 
-option(PIXMAN_BUILD_TESTS "Build and run regression tests" ON)
-option(PIXMAN_BUILD_DEMOS "Build demo code" ON)
+option(PIXMAN_BUILD_TESTS "Build and run regression tests" OFF)
+option(PIXMAN_BUILD_DEMOS "Build demo code" OFF)
 option(PIXMAN_TIMERS "Enable TIMER_BEGIN/TIMER_END macros" OFF)
 
 
