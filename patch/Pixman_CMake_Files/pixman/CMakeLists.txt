@@ -193,6 +193,12 @@ if(LIBM_LIBRARY)
   target_link_libraries(pixman PUBLIC ${LIBM_LIBRARY})
 endif()
 
+if(MSVC AND BUILD_SHARED_LIBS)
+  set_target_properties(pixman PROPERTIES
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
+  )
+endif()
+
 set_target_properties(pixman PROPERTIES
   OUTPUT_NAME pixman-1
   CXX_VISIBILITY_PRESET hidden

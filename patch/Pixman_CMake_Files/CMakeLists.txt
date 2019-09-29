@@ -1,5 +1,10 @@
 project(pixman C ASM)
-cmake_minimum_required(VERSION 3.1)
+
+if(MSVC)
+  cmake_minimum_required(VERSION 3.4)
+else()
+  cmake_minimum_required(VERSION 3.1)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
