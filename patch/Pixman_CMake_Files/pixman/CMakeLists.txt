@@ -172,9 +172,27 @@ if(USE_LOONGSON_MMI)
 endif()
 
 add_library(pixman ${SOURCES} ${HEADERS})
-if(LIBM_LIBRARY)
-  target_link_libraries(pixman m)
+target_compile_definitions(pixman PUBLIC HAVE_CONFIG_H)
+target_compile_options(pixman PUBLIC ${PIXMAN_C_FLAGS})
+
+target_include_directories(pixman PUBLIC
+  ${PROJECT_SOURCE_DIR}/pixman
+  ${PROJECT_BINARY_DIR}/pixman
+)
+if(ANDROID)
+  target_include_directories(pixman PUBLIC
+    "${ANDROID_NDK}/sources/android/cpufeatures"
+  )
 endif()
+
+if(Threads_FOUND)
+  target_link_libraries(pixman PUBLIC Threads::Threads)
+endif()
+
+if(LIBM_LIBRARY)
+  target_link_libraries(pixman PUBLIC ${LIBM_LIBRARY})
+endif()
+
 set_target_properties(pixman PROPERTIES
   OUTPUT_NAME pixman-1
   CXX_VISIBILITY_PRESET hidden

@@ -1,8 +1,3 @@
-# TODO: use modern CMake
-include_directories(${GTK_INCLUDE_DIRS})
-link_directories(${GTK_LIBRARY_DIRS})
-add_definitions(${GTK_CFLAGS_OTHER})
-
 set(DEMOS
   clip-test
   clip-in
@@ -27,14 +22,17 @@ add_library(pixman_gtk_utils STATIC
   gtk-utils.c
   gtk-utils.h
 )
-target_link_libraries(pixman_gtk_utils
+target_compile_options(pixman_gtk_utils PUBLIC ${GTK_CFLAGS})
+target_include_directories(pixman_gtk_utils PUBLIC ${GTK_INCLUDE_DIRS})
+target_link_libraries(pixman_gtk_utils PUBLIC
   pixman_test_utils
-  ${GTK_LIBRARIES}
+  ${GTK_LDFLAGS} ${GTK_LIBRARY_DIRS} ${GTK_LIBRARIES}
 )
 
 foreach(program ${DEMOS})
   add_executable(pixman_${program} ${program}.c)
+  target_link_libraries(pixman_${program} PRIVATE pixman_gtk_utils)
   set_target_properties(pixman_${program} PROPERTIES
-    OUTPUT_NAME ${program})
-  target_link_libraries(pixman_${program} pixman_gtk_utils)
+    OUTPUT_NAME ${program}
+  )
 endforeach()

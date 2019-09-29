@@ -48,15 +48,23 @@ add_library(pixman_test_utils STATIC
   utils.h
   utils-prng.h
 )
-target_link_libraries(pixman_test_utils pixman)
+
+if(OpenMP_FOUND)
+  target_compile_options(pixman_test_utils PUBLIC ${OpenMP_C_FLAGS})
+  target_link_libraries(pixman_test_utils PUBLIC ${OpenMP_C_FLAGS})
+endif()
+target_link_libraries(pixman_test_utils PUBLIC pixman)
+if(PNG_FOUND)
+  target_compile_definitions(pixman_test_utils PUBLIC ${PNG_DEFINITIONS})
+  target_include_directories(pixman_test_utils PUBLIC ${PNG_INCLUDE_DIRS})
+  target_link_libraries(pixman_test_utils PUBLIC ${PNG_LIBRARIES})
+endif()
 
 foreach(program ${TESTPROGRAMS} ${OTHERPROGRAMS})
   add_executable(pixman_${program} ${program}.c)
+  target_link_libraries(pixman_${program} PRIVATE pixman_test_utils)
   set_target_properties(pixman_${program} PROPERTIES
     OUTPUT_NAME ${program}
-  )
-  target_link_libraries(pixman_${program}
-    pixman_test_utils
   )
 endforeach()
 
