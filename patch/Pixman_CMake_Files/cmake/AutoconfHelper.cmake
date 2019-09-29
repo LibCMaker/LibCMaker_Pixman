@@ -1,3 +1,7 @@
+# Copyright (c) 2019, NikitaFeodonit. All rights reserved.
+#
+## Helper functions for translating autoconf projects to CMake
+
 # The main idea and part of the source codes are from
 # https://github.com/tomhughes/libdwarf/blob/master/cmake/AutoconfHelper.cmake
 
@@ -200,7 +204,7 @@ endfunction()
 
 
 # ========================================================================
-# Below is not used from
+# Below codes are not used in Pixman and are from
 # https://github.com/tomhughes/libdwarf/blob/master/cmake/AutoconfHelper.cmake
 #
 

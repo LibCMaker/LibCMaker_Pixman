@@ -1,3 +1,10 @@
+# Copyright (c) 2019, NikitaFeodonit. All rights reserved.
+#
+## Pixman build file for CMake build tools
+
+# Based on the code from
+# https://github.com/solvespace/pixman/tree/0.34+cmake
+
 set(TESTPROGRAMS
   oob-test
   infinite-loop
