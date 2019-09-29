@@ -50,7 +50,33 @@ set(COPY_PIXMAN_CMAKE_BUILD_SCRIPTS ON)
 
 option(PIXMAN_BUILD_TESTS "Build and run regression tests" OFF)
 option(PIXMAN_BUILD_DEMOS "Build demo code" OFF)
-option(PIXMAN_TIMERS "Enable TIMER_BEGIN/TIMER_END macros" OFF)
+
+option(PIXMAN_ENABLE_OPENMP                                 "Enable OpenMP" ON)
+option(PIXMAN_ENABLE_LOONGSON_MMI          "Enable Loongson MMI fast paths" ON)
+option(PIXMAN_ENABLE_MMX                        "Enable x86 MMX fast paths" ON)
+option(PIXMAN_ENABLE_SSE2                          "Enable SSE2 fast paths" ON)
+option(PIXMAN_ENABLE_SSSE3                        "Enable SSSE3 fast paths" ON)
+option(PIXMAN_ENABLE_VMX                            "Enable VMX fast paths" ON)
+option(PIXMAN_ENABLE_ARM_SIMD                  "Enable ARM SIMD fast paths" ON)
+option(PIXMAN_ENABLE_ARM_NEON                  "Enable ARM NEON fast paths" ON)
+option(PIXMAN_ENABLE_ARM_IWMMXT              "Enable ARM IWMMXT fast paths" ON)
+option(PIXMAN_ENABLE_ARM_IWMMXT2
+  "Build ARM IWMMXT fast paths with -march=iwmmxt instead of -march=iwmmxt2"
+  ON
+)
+option(PIXMAN_ENABLE_MIPS_DSPR2              "Enable MIPS DSPr2 fast paths" ON)
+option(PIXMAN_ENABLE_GCC_INLINE_ASM     "Enable GNU-style inline assembler" ON)
+option(PIXMAN_ENABLE_STATIC_TESTPROGS
+  "Build test programs as static binaries"
+  OFF
+)
+option(PIXMAN_ENABLE_TIMERS       "Enable TIMER_BEGIN and TIMER_END macros" OFF)
+option(PIXMAN_ENABLE_GNUPLOT
+  "Enable output of filters that can be piped to gnuplot"
+  OFF
+)
+option(PIXMAN_ENABLE_GTK                          "Enable tests using GTK+" OFF)
+option(PIXMAN_ENABLE_LIBPNG                      "Build support for libpng" OFF)
 
 
 #-----------------------------------------------------------------------
