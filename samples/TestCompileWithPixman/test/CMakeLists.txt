@@ -37,8 +37,7 @@ if(BUILD_TESTING)
   )
 
   # Pixman
-  target_include_directories(${test_NAME} PRIVATE ${PIXMAN_INCLUDE_DIRS})
-  target_link_libraries(${test_NAME} PRIVATE ${PIXMAN_LIBRARIES})
+  target_link_libraries(${test_NAME} PRIVATE Pixman::Pixman)
 
   target_link_libraries(${test_NAME} PRIVATE
     GTest::GTest GTest::Main

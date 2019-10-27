@@ -4,6 +4,7 @@
 #  PIXMAN_FOUND - Pixman was found
 #  PIXMAN_INCLUDE_DIRS - the Pixman include directories
 #  PIXMAN_LIBRARIES - link these to use Pixman
+#  Pixman::Pixman - imported target
 #
 # Copyright (C) 2018 Sony Interactive Entertainment Inc.
 #
@@ -29,42 +30,55 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 
 find_path(PIXMAN_INCLUDE_DIRS
-    NAMES pixman.h
-    PATH_SUFFIXES pixman-1
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
+  NAMES pixman.h
+  PATH_SUFFIXES pixman-1
+  NO_CMAKE_ENVIRONMENT_PATH
+  NO_SYSTEM_ENVIRONMENT_PATH
+  NO_CMAKE_SYSTEM_PATH
 )
 
 find_library(PIXMAN_LIBRARIES
-    NAMES pixman-1
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
+  NAMES pixman-1
+  NO_CMAKE_ENVIRONMENT_PATH
+  NO_SYSTEM_ENVIRONMENT_PATH
+  NO_CMAKE_SYSTEM_PATH
 )
 
-if (PIXMAN_INCLUDE_DIRS)
-    if (EXISTS "${PIXMAN_INCLUDE_DIRS}/pixman-version.h")
-        file(READ "${PIXMAN_INCLUDE_DIRS}/pixman-version.h" PIXMAN_VERSION_CONTENT)
+if(PIXMAN_INCLUDE_DIRS)
+  if(EXISTS "${PIXMAN_INCLUDE_DIRS}/pixman-version.h")
+    file(READ "${PIXMAN_INCLUDE_DIRS}/pixman-version.h" PIXMAN_VERSION_CONTENT)
 
-        string(REGEX MATCH "#define +PIXMAN_VERSION_MAJOR +([0-9]+)" _dummy "${PIXMAN_VERSION_CONTENT}")
-        set(PIXMAN_VERSION_MAJOR "${CMAKE_MATCH_1}")
+    string(REGEX MATCH "#define +PIXMAN_VERSION_MAJOR +([0-9]+)" _dummy "${PIXMAN_VERSION_CONTENT}")
+    set(PIXMAN_VERSION_MAJOR "${CMAKE_MATCH_1}")
 
-        string(REGEX MATCH "#define +PIXMAN_VERSION_MINOR +([0-9]+)" _dummy "${PIXMAN_VERSION_CONTENT}")
-        set(PIXMAN_VERSION_MINOR "${CMAKE_MATCH_1}")
+    string(REGEX MATCH "#define +PIXMAN_VERSION_MINOR +([0-9]+)" _dummy "${PIXMAN_VERSION_CONTENT}")
+    set(PIXMAN_VERSION_MINOR "${CMAKE_MATCH_1}")
 
-        string(REGEX MATCH "#define +PIXMAN_VERSION_MICRO +([0-9]+)" _dummy "${PIXMAN_VERSION_CONTENT}")
-        set(PIXMAN_VERSION_MICRO "${CMAKE_MATCH_1}")
+    string(REGEX MATCH "#define +PIXMAN_VERSION_MICRO +([0-9]+)" _dummy "${PIXMAN_VERSION_CONTENT}")
+    set(PIXMAN_VERSION_MICRO "${CMAKE_MATCH_1}")
 
-        set(PIXMAN_VERSION "${PIXMAN_VERSION_MAJOR}.${PIXMAN_VERSION_MINOR}.${PIXMAN_VERSION_MICRO}")
-    endif ()
+    set(PIXMAN_VERSION "${PIXMAN_VERSION_MAJOR}.${PIXMAN_VERSION_MINOR}.${PIXMAN_VERSION_MICRO}")
+  endif ()
 endif ()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Pixman REQUIRED_VARS PIXMAN_INCLUDE_DIRS PIXMAN_LIBRARIES
-                                         VERSION_VAR PIXMAN_VERSION)
+find_package_handle_standard_args(Pixman
+  REQUIRED_VARS
+  PIXMAN_INCLUDE_DIRS
+  PIXMAN_LIBRARIES
+  VERSION_VAR
+  PIXMAN_VERSION
+)
+
+if(PIXMAN_FOUND AND NOT TARGET Pixman::Pixman)
+  add_library(Pixman::Pixman UNKNOWN IMPORTED)
+  set_target_properties(Pixman::Pixman PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${PIXMAN_INCLUDE_DIRS}"
+    IMPORTED_LOCATION "${PIXMAN_LIBRARIES}"
+  )
+endif()
 
 mark_as_advanced(
-    PIXMAN_INCLUDE_DIRS
-    PIXMAN_LIBRARIES
+  PIXMAN_INCLUDE_DIRS
+  PIXMAN_LIBRARIES
 )

@@ -92,8 +92,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 #-----------------------------------------------------------------------
 
 # Pixman
-target_include_directories(${PROJECT_NAME} PRIVATE ${PIXMAN_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PIXMAN_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE Pixman::Pixman)
 
 
 #-----------------------------------------------------------------------
