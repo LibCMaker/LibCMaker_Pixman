@@ -5,13 +5,13 @@
 # Based on the code from
 # https://github.com/solvespace/pixman/tree/0.34+cmake
 
-project(pixman C ASM)
-
 if(MSVC)
   cmake_minimum_required(VERSION 3.4)
 else()
   cmake_minimum_required(VERSION 3.1)
 endif()
+
+project(pixman C ASM)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
