@@ -568,9 +568,11 @@ endif()
 #  set(sqrtf "sqrt")
 #endif()
 
-find_library(LIBM_LIBRARY "m")
-if(LIBM_LIBRARY)
-  set(CMAKE_REQUIRED_LIBRARIES ${LIBM_LIBRARY})
+if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT BEOS AND NOT HAIKU)
+  find_library(LIBM_LIBRARY "m")
+  if(LIBM_LIBRARY)
+    set(CMAKE_REQUIRED_LIBRARIES ${LIBM_LIBRARY})
+  endif()
 endif()
 check_c_source_compiles(
 "#include <math.h>
