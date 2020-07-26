@@ -29,9 +29,9 @@
 # Lib's name, version, paths
 #-----------------------------------------------------------------------
 
-set(PIXMAN_lib_NAME      "Pixman")
-set(PIXMAN_lib_VERSION   "0.38.4")
-set(PIXMAN_lib_DIR       "${CMAKE_CURRENT_LIST_DIR}")
+set(PIXMAN_lib_NAME "Pixman")
+set(PIXMAN_lib_VERSION "0.38.4" CACHE STRING "PIXMAN_lib_VERSION")
+set(PIXMAN_lib_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE PATH "PIXMAN_lib_DIR")
 
 # To use our Find<LibName>.cmake.
 list(APPEND CMAKE_MODULE_PATH "${PIXMAN_lib_DIR}/cmake/modules")
@@ -41,7 +41,7 @@ list(APPEND CMAKE_MODULE_PATH "${PIXMAN_lib_DIR}/cmake/modules")
 # LibCMaker_<LibName> specific vars and options
 #-----------------------------------------------------------------------
 
-set(COPY_PIXMAN_CMAKE_BUILD_SCRIPTS ON)
+option(COPY_PIXMAN_CMAKE_BUILD_SCRIPTS "COPY_PIXMAN_CMAKE_BUILD_SCRIPTS" ON)
 
 
 #-----------------------------------------------------------------------
